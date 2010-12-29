@@ -1,0 +1,5 @@
+2010-12-29 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
+
+	* backup.py: finalizadas primeiras versões para teste e adaptação
+
+	* utils.py: funções auxiliares funcionando

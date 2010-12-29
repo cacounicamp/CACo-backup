@@ -1,1 +1,18 @@
 Programa simples para realizar backup dos computadores do CACo.
+
+Pré-requisitos:
+	* python 2.7
+	* ssh
+	* host de destino com autenticação via chave sem senha, e hash do sshd no 
+	  known_hosts do usuário
+	* rsync
+	* GNU tar e xz-utils (e/ou bzip2, e/ou gzip) (opcional)
+	
+Uso:
+	# TODO: implementar uma interface de uso decente
+
+Autor(es):
+	* Ivan Sichmann Freitas
+
+Licença:
+	* GPLv3
