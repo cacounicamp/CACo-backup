@@ -1,6 +1,5 @@
 #!/usr/bin/python2
-
-# -*- encoding: utf-8 -*-
+# -*- coding: utf8 -*-
 
 # Script para realizar backup das máquinas do CACo
 
@@ -33,6 +32,7 @@ class BackupTarget():
 		self.compress = compress_type # tipo de compactação possivelmente utilizada
 
 	def run_backup(self):
+		# TODO: implementar verificações para outros protocolos
 		""" Realiza as operações de backup """
 		if self.protocol == "rsync":
 			status = utils.rsync(self.source_path, self.destiny)
@@ -49,14 +49,18 @@ class BackupTarget():
 		else:
 			print >> sys.stdout, "Erro na compactação do arquivo, utilizando arquivo original"
 
-# Roda o dpkg para pegar a lista de pacotes e retorna o caminho do arquivo criado
-def listaDePacotes():
+def listaDePacotes(pkglist_file = "~/.pkg_list"):
 	""" Função que gera a lista dos pacotes instalados no sistema """
-	pacotes = "~/.pkg_list"
-	os.system("dpkg -l '*' >" + pacotes)
-	return pacotes
+	os.system("dpkg -l '*' > " + pkglist_file)
+	return pkglist_file
 
 # iniciando a execução do script
 
 # TODO: implementar leitura de parâmetros a partir de um arquivo padrão em /etc
-# TODO: implementar a execução normal do script =)
+
+backup_list = []
+for bfile in [".bashrc", ".vimrc", ".valgrindrc"]:
+	backup_list.append(BackupTarget(bfile, "~/teste", "rsync"))
+
+for backup in backup_list:
+	backup.run_backup()
