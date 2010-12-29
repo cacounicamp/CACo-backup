@@ -49,6 +49,7 @@ class BackupTarget():
 		else:
 			print >> sys.stdout, "Erro na compactação do arquivo, utilizando arquivo original"
 
+# TODO: testar funcionamento do gerador de lista de pacotes
 def listaDePacotes(pkglist_file = "~/.pkg_list"):
 	""" Função que gera a lista dos pacotes instalados no sistema """
 	os.system("dpkg -l '*' > " + pkglist_file)
