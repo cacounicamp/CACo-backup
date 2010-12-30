@@ -4,6 +4,13 @@
 
 	* utils.py: funções auxiliares funcionando
 
-2010-12-31 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
+2010-12-30 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
 
 	* backup.py: leitura básica do arquivo de configuração finalizada
+	
+	* backup.py (listaDePacotes): função listaDePacotes movida para o arquivo
+	utils.py
+	
+	* backup.py: implementando um esquema de logging em algumas partes do
+	código
+	* utils.py: implementando um esquema de logging básico
