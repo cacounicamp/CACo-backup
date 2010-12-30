@@ -49,3 +49,9 @@ def compress(compression_type, source, opts=""):
         print >> sys.stdout, "Erro durante a compressão do arquivo: %d" %exit_status
         tmp_file = "" # retornará string vazia para o caminho em caso de falha
     return tmp_file
+
+# TODO: testar funcionamento do gerador de lista de pacotes
+def listaDePacotes(pkglist_file = "~/.pkg_list"):
+    """ Função que gera a lista dos pacotes instalados no sistema """
+    os.system("dpkg -l '*' > " + pkglist_file)
+    return pkglist_file
