@@ -18,50 +18,75 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# standard libs
 import os
 import sys
+import ConfigParser
+
+# libs locais
 import utils
 
+# Classe que representa um alvo de backup
 class BackupTarget():
-	def __init__(self, source, destiny, protocol_type, compress_type = "xz"):
-		# TODO: implementar validação da entrada. Todos os atributos iniciais
-		# devem ser strings.
-		self.source_path = source     # caminho do arquivo original
-		self.destiny = destiny        # url do destino do backup (será utilizado o mesmo path da fonte)
-		self.protocol = protocol_type # protocolo para realização do backup (ssh, rsync etc.)
-		self.compress = compress_type # tipo de compactação possivelmente utilizada
+    def __init__(self, source, destiny, protocol_type, compress_type = "xz"):
+        # TODO: implementar validação da entrada. Todos os atributos iniciais
+        # devem ser strings.
+        self.source_path = source     # caminho do arquivo original
+        self.destiny = destiny        # url do destino do backup (será utilizado o mesmo path da fonte)
+        self.protocol = protocol_type # protocolo para realização do backup (ssh, rsync etc.)
+        self.compress = compress_type # tipo de compactação possivelmente utilizada
 
-	def run_backup(self):
-		# TODO: implementar verificações para outros protocolos
-		""" Realiza as operações de backup """
-		if self.protocol == "rsync":
-			status = utils.rsync(self.source_path, self.destiny)
-		return status
+    def run_backup(self):
+        # TODO: implementar verificações para outros protocolos
+        """ Realiza as operações de backup """
+        if self.protocol == "rsync":
+            status = utils.rsync(self.source_path, self.destiny)
+        return status
 
-	def pack(self):
-		"""
-		 Compacta o arquivo/diretório do alvo de backup. O novo alvo passa a
-		 ser um arquivo compactado em /tmp
-		"""
-		new_path = utils.compress(self.compress, self.source_path)
-		if new_path != "":
-			self.source_path = new_path
-		else:
-			print >> sys.stdout, "Erro na compactação do arquivo, utilizando arquivo original"
+    def pack(self):
+        """
+         Compacta o arquivo/diretório do alvo de backup. O novo alvo passa a
+         ser um arquivo compactado em /tmp
+        """
+        new_path = utils.compress(self.compress, self.source_path)
+        if new_path != "":
+            self.source_path = new_path
+        else:
+            print >> sys.stdout, "Erro na compactação do arquivo, utilizando arquivo original"
 
 # TODO: testar funcionamento do gerador de lista de pacotes
 def listaDePacotes(pkglist_file = "~/.pkg_list"):
-	""" Função que gera a lista dos pacotes instalados no sistema """
-	os.system("dpkg -l '*' > " + pkglist_file)
-	return pkglist_file
+    """ Função que gera a lista dos pacotes instalados no sistema """
+    os.system("dpkg -l '*' > " + pkglist_file)
+    return pkglist_file
 
 # iniciando a execução do script
 
-# TODO: implementar leitura de parâmetros a partir de um arquivo padrão em /etc
+# lendo a configuração
+# Exemplo de configuração:
+# [defaults]
+# destination = /home/ivan/teste
+# protocol = rsync
+# files = ~/.vimrc,~/.bashrc,~/.tmux.conf
+# compression_type = xz
+# use_compression = false
+#
+# [path_to_specific_files]
+# # aqui vem as opções especiais, irão sobrescrever as padrão
+
+# TODO: implementar a verificação por compressão
+# TODO: implementar a verificação de seções especiais (i.e., arquivos com opções diferentes)
+# TODO: implementar a validação do arquivo de configuração, somente a seção [defaults] 
+# TODO: permitir a utilização de variáveis de bash em caminhos de arquivo
+# é obrigatória, com todos os seus membros, e os tipos devem ser verificados
+CONFIG_FILES = ["/etc/caco_backup.conf","/home/ivan/.caco_backup.conf"]
+config = ConfigParser.ConfigParser()
+config.read(CONFIG_FILES)
 
 backup_list = []
-for bfile in [".bashrc", ".vimrc", ".valgrindrc"]:
-	backup_list.append(BackupTarget(bfile, "~/teste", "rsync"))
+for bfile in config.get("defaults", "files").split(","):
+    backup_list.append(BackupTarget(bfile, config.get("defaults", "destination"),
+                                    config.get("defaults", "protocol")))
 
 for backup in backup_list:
-	backup.run_backup()
+    backup.run_backup()
