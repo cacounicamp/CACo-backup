@@ -3,3 +3,7 @@
 	* backup.py: finalizadas primeiras versões para teste e adaptação
 
 	* utils.py: funções auxiliares funcionando
+
+2010-12-31 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
+
+	* backup.py: leitura básica do arquivo de configuração finalizada
