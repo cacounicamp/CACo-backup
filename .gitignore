@@ -2,3 +2,5 @@ tags
 Session.vim
 *.pyc
 *.swp
+*.swo
+*.swn
