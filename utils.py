@@ -23,29 +23,29 @@ import sys
 # IMPORTANTE: para funcionar, precisa ter chave ssh e host do destino no
 # know_hosts do usuário
 def rsync(source, destinyURL, opts=""):
-	# TODO: verificar se os argumentos estão corretos
-	""" Executa um rsync. O argumento 'opts' é opcional """
-	# rsync -avLz
-	rsync_command="rsync --archive --verbose --copy-links --compress"
-	# executa o comando e guarda o status de retorno
-	exit_status = os.system(" ".join([rsync_command, opts, source, destinyURL]))
-	if exit_status != os.EX_OK:
-		print >> sys.stdout, "Erro durante o rsync: %d" %exit_status
-	return exit_status
+    # TODO: verificar se os argumentos estão corretos
+    """ Executa um rsync. O argumento 'opts' é opcional """
+    # rsync -avLz
+    rsync_command="rsync --archive --verbose --copy-links --compress"
+    # executa o comando e guarda o status de retorno
+    exit_status = os.system(" ".join([rsync_command, opts, source, destinyURL]))
+    if exit_status != os.EX_OK:
+        print >> sys.stdout, "Erro durante o rsync: %d" %exit_status
+    return exit_status
 
 def compress(compression_type, source, opts=""):
-	""" Compacta um arquivo/diretório em algum lugar em /tmp, retonando o
-	caminho desse novo arquivo """
-	# TODO: validar argumentos
-	# o espaço no final do segundo membro de cada item do dicionário é importante
-	compression_opts = {
-		"xz":"tar -cJf",
-		"gz":"tar -czf",
-		"bz2": "tar -cjf"
-	}
-	tmp_file = os.tmpnam() + ".tar." + compression_type
-	exit_status = os.system(" ".join([compression_opts[compression_type], opts, tmp_file, source]))
-	if exit_status != os.EX_OK:
-		print >> sys.stdout, "Erro durante a compressão do arquivo: %d" %exit_status
-		tmp_file = "" # retornará string vazia para o caminho em caso de falha
-	return tmp_file
+    """ Compacta um arquivo/diretório em algum lugar em /tmp, retonando o
+    caminho desse novo arquivo """
+    # TODO: validar argumentos
+    # o espaço no final do segundo membro de cada item do dicionário é importante
+    compression_opts = {
+        "xz":"tar -cJf",
+        "gz":"tar -czf",
+        "bz2": "tar -cjf"
+    }
+    tmp_file = os.tmpnam() + ".tar." + compression_type
+    exit_status = os.system(" ".join([compression_opts[compression_type], opts, tmp_file, source]))
+    if exit_status != os.EX_OK:
+        print >> sys.stdout, "Erro durante a compressão do arquivo: %d" %exit_status
+        tmp_file = "" # retornará string vazia para o caminho em caso de falha
+    return tmp_file
