@@ -88,5 +88,5 @@ for bfile in config.get("defaults", "files").split(","):
     backup_list.append(BackupTarget(bfile, config.get("defaults", "destination"),
                                     config.get("defaults", "protocol")))
 
-for backup in backup_list:
-    backup.run_backup()
+# TODO:verificar retorno do mapeamento em busca de erros
+map (lambda x: x.run_backup(), backup_list)
