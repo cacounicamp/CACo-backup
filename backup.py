@@ -20,7 +20,6 @@
 
 # standard libs
 import os
-import sys
 import ConfigParser
 import logging
 
@@ -28,6 +27,7 @@ import logging
 import utils
 
 # configurando o logging
+# TODO: configurar melhor a saída do log
 LOG_FILE = "${HOME}/caco_backup.log"
 logging.basicConfig(filename=os.path.expandvars(LOG_FILE))
 logger = logging.getLogger("backup.py")
@@ -36,7 +36,12 @@ logger.setLevel(logging.DEBUG)
 # Classe que representa um alvo de backup
 class BackupTarget():
     def __init__(self, source, destiny, protocol_type, compress_type = "xz"):
-        # TODO: implementar validação da entrada. Todos os atributos iniciais
+        # FIXME: encontrar uma forma mais elegante para validação dos parâmetros, e aplicar onde for necessário
+        if (type(source) != type(str()) or
+            type(destiny) != type(str()) or
+            type(protocol_type) != type(str()) or
+            type(compress_type) != type(str())):
+            logger.error("Argumentos inválidos para inicialização da classe BackupTarget")
         # devem ser strings.
         self.source_path = source     # caminho do arquivo original
         self.destiny = destiny        # url do destino do backup (será utilizado o mesmo path da fonte)
@@ -45,11 +50,14 @@ class BackupTarget():
 
     def run_backup(self):
         """ Realiza as operações de backup """
-        # TODO: logar essa função, quando não houver o protocolo especificado
         if self.protocol == "rsync":
             status = utils.rsync(self.source_path, self.destiny)
+        else:
+            logger.warning("Protocolo especificado é inexistente")
+            status = os.EX_DATAERR
         return status
 
+    # TODO: testar a função pack
     def pack(self):
         """
          Compacta o arquivo/diretório do alvo de backup. O novo alvo passa a
@@ -59,7 +67,7 @@ class BackupTarget():
         if new_path != "":
             self.source_path = new_path
         else:
-            print >> sys.stdout, "Erro na compactação do arquivo, utilizando arquivo original"
+            logger.error("Erro na compactação do arquivo, utilizando arquivo original")
 
 ### iniciando a execução do script
 
@@ -78,7 +86,6 @@ class BackupTarget():
 # TODO: implementar a verificação por compressão
 # TODO: implementar a verificação de seções especiais (i.e., arquivos com opções diferentes)
 # TODO: implementar a validação do arquivo de configuração, somente a seção [defaults] 
-# TODO: permitir a utilização de variáveis de bash em caminhos de arquivo
 # é obrigatória, com todos os seus membros, e os tipos devem ser verificados
 logger.info("Iniciando o backup")
 # TODO: logar a leitura da configuração

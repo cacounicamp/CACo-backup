@@ -22,3 +22,6 @@
 	
 	* utils.py: implementando a substituição de variáveis de ambiente em
 	caminhos de arquivo
+	
+	* backup.py (BackupTarget.__init__): implementando validação do tipo dos
+	parâmetros passados na construção
