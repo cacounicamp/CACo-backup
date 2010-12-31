@@ -25,3 +25,5 @@
 	
 	* backup.py (BackupTarget.__init__): implementando validação do tipo dos
 	parâmetros passados na construção
+	
+	* backup.py: removendo arquivo utils.py e deixando tudo em um arquivo só
