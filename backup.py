@@ -19,6 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # standard libs
+import os
 import sys
 import ConfigParser
 import logging
@@ -27,9 +28,8 @@ import logging
 import utils
 
 # configurando o logging
-# TODO: mudar esse caminho depois
-LOG_FILE = "/home/ivan/caco_backup.log"
-logging.basicConfig(filename=LOG_FILE)
+LOG_FILE = "${HOME}/caco_backup.log"
+logging.basicConfig(filename=os.path.expandvars(LOG_FILE))
 logger = logging.getLogger("backup.py")
 logger.setLevel(logging.DEBUG)
 
@@ -82,9 +82,9 @@ class BackupTarget():
 # é obrigatória, com todos os seus membros, e os tipos devem ser verificados
 logger.info("Iniciando o backup")
 # TODO: logar a leitura da configuração
-CONFIG_FILES = ["/etc/caco_backup.conf","/home/ivan/.caco_backup.conf"]
+config_files = ["/etc/caco_backup.conf", os.path.expandvars("${HOME}/.caco_backup.conf")]
 config = ConfigParser.ConfigParser()
-config.read(CONFIG_FILES)
+config.read(config_files)
 
 backup_list = []
 for bfile in config.get("defaults", "files").split(","):

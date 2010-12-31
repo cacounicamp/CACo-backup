@@ -14,3 +14,11 @@
 	* backup.py: implementando um esquema de logging em algumas partes do
 	código
 	* utils.py: implementando um esquema de logging básico
+	
+2010-12-31 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
+	
+	* backup.py: implementando a substituição de variáveis de ambiente em
+	caminhos de arquivo
+	
+	* utils.py: implementando a substituição de variáveis de ambiente em
+	caminhos de arquivo

@@ -20,9 +20,7 @@
 import os
 import logging
 
-# TODO: mudar esse caminho
-logging.basicConfig(filename="/home/ivan/caco_backup.log")
-
+logging.basicConfig(filename=os.path.expandvars("${HOME}/caco_backup.log"))
 logger = logging.getLogger("utils.py")
 logger.setLevel(logging.INFO)
 
@@ -70,7 +68,7 @@ def compress(compression_type, source, opts=""):
     return tmp_file
 
 # TODO: testar funcionamento do gerador de lista de pacotes
-def listaDePacotes(pkglist_file = "~/.pkg_list"):
+def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
     """ Função que gera a lista dos pacotes instalados no sistema """
     if type(pkglist_file) != type(str()):
         logger.error("Argumento de 'listaDePacotes' não é string")
