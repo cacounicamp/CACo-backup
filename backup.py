@@ -3,7 +3,7 @@
 
 # Script para realizar backup das máquinas do CACo
 
-# Copyrigth 2010 Ivan Sichmann Freitas 
+# Copyrigth 2010,2011 Ivan Sichmann Freitas 
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -47,11 +47,6 @@ class Tools():
     # know_hosts do usuário
     def rsync(self, source, destinyURL, opts=""):
         """ Executa um rsync. O argumento 'opts' é opcional """
-        if (type(source) != type(str()) or
-            type(destinyURL) != type(str()) or
-            type(opts) != type(str())):
-            logger.error("Argumentos de 'rsync' não são strings")
-            return os.EX_DATAERR
         # rsync -avLz
         rsync_command="rsync --archive --verbose --copy-links --compress"
         # executa o comando e guarda o status de retorno
@@ -64,12 +59,6 @@ class Tools():
     def compress(self, compression_type, source, opts=""):
         """ Compacta um arquivo/diretório em algum lugar em /tmp, retonando o
         caminho desse novo arquivo """
-        if (type(compression_type) != type(str()) or
-            type(source) != type(str()) or
-            type(opts) != type(str())):
-            logger.error("Argumentos de 'compress' não são strings")
-            return os.EX_DATAERR
-
         # dicionário com os tipos de compressão e seus respectivos comandos
         compression_opts = {
             "xz":"tar -cJf",
@@ -88,13 +77,6 @@ class Tools():
 # Classe que representa um alvo de backup
 class BackupTarget(Tools):
     def __init__(self, source, destiny, protocol_type, compress_type = "xz"):
-        # FIXME: encontrar uma forma mais elegante para validação dos parâmetros, e aplicar onde for necessário
-        if (type(source) != type(str()) or
-            type(destiny) != type(str()) or
-            type(protocol_type) != type(str()) or
-            type(compress_type) != type(str())):
-            logger.error("Argumentos inválidos para inicialização da classe BackupTarget")
-        # devem ser strings.
         self.source_path = source     # caminho do arquivo original
         self.destiny = destiny        # url do destino do backup (será utilizado o mesmo path da fonte)
         self.protocol = protocol_type # protocolo para realização do backup (ssh, rsync etc.)
@@ -127,9 +109,6 @@ class BackupTarget(Tools):
 # TODO: testar funcionamento do gerador de lista de pacotes
 def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
     """ Função que gera a lista dos pacotes instalados no sistema """
-    if type(pkglist_file) != type(str()):
-        logger.error("Argumento de 'listaDePacotes' não é string")
-        return ""
     os.system("dpkg -l '*' > " + pkglist_file)
     return pkglist_file
 

@@ -27,3 +27,9 @@
 	parâmetros passados na construção
 	
 	* backup.py: removendo arquivo utils.py e deixando tudo em um arquivo só
+	
+2011-01-02 Ivan Sichmann Freitas <ivansichfreitas@gmail.com>
+
+	* backup.py: removendo a checagem desnecessária de tipos
+	
+	* backup.py: atualizando informação de copyright
