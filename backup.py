@@ -27,18 +27,6 @@ import ConfigParser
 import logging
 
 ################################################################################
-# Configurando o logging
-################################################################################
-
-log_file = os.path.expandvars("${HOME}/caco_backup.log")
-if os.path.lexists(log_file):
-    os.remove(log_file) # limpando o log antigo
-logging.basicConfig(filename=log_file,
-                    format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
-logger = logging.getLogger("backup.py")
-logger.setLevel(logging.DEBUG)
-
-################################################################################
 # Classes
 ################################################################################
 
@@ -93,8 +81,8 @@ class BackupTarget(Tools):
 
     def pack(self):
         """
-         Compacta o arquivo/diretório do alvo de backup. O novo alvo passa a
-         ser um arquivo compactado em /tmp
+        Compacta o arquivo/diretório do alvo de backup. O novo alvo passa a
+        ser um arquivo compactado em /tmp
         """
         new_path = self.compress(self.compress, self.source_path)
         if new_path != "":
@@ -103,14 +91,27 @@ class BackupTarget(Tools):
             logger.error("Erro na compactação do arquivo, utilizando arquivo original")
 
 ################################################################################
+# Configurando o logging
+################################################################################
+
+if __name__ == "__main__":
+    log_file = os.path.expandvars("${HOME}/caco_backup.log")
+    if os.path.lexists(log_file):
+        os.remove(log_file) # limpando o log antigo
+    logging.basicConfig(filename=log_file,
+                        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+    logger = logging.getLogger("backup.py")
+    logger.setLevel(logging.DEBUG)
+
+################################################################################
 # Funções
 ################################################################################
 
 # TODO: testar funcionamento do gerador de lista de pacotes
-def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
-    """ Função que gera a lista dos pacotes instalados no sistema """
-    os.system("dpkg -l '*' > " + pkglist_file)
-    return pkglist_file
+    def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
+        """ Função que gera a lista dos pacotes instalados no sistema """
+        os.system("dpkg -l '*' > " + pkglist_file)
+        return pkglist_file
 
 ################################################################################
 # Iniciando a execução do script
@@ -132,16 +133,16 @@ def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
 # TODO: implementar a verificação de seções especiais (i.e., arquivos com opções diferentes)
 # TODO: implementar a validação do arquivo de configuração, somente a seção [defaults] 
 # é obrigatória, com todos os seus membros, e os tipos devem ser verificados
-logger.info("Iniciando o backup")
+    logger.info("Iniciando o backup")
 # TODO: logar a leitura da configuração
-config_files = ["/etc/caco_backup.conf", os.path.expandvars("${HOME}/.caco_backup.conf")]
-config = ConfigParser.ConfigParser()
-config.read(config_files)
+    config_files = ["/etc/caco_backup.conf", os.path.expandvars("${HOME}/.caco_backup.conf")]
+    config = ConfigParser.ConfigParser()
+    config.read(config_files)
 
-backup_list = []
-for bfile in config.get("defaults", "files").split(","):
-    backup_list.append(BackupTarget(bfile, config.get("defaults", "destination"),
-                                    config.get("defaults", "protocol")))
-    logger.info("Preparando backup de %s" %bfile)
+    backup_list = []
+    for bfile in config.get("defaults", "files").split(","):
+        backup_list.append(BackupTarget(bfile, config.get("defaults", "destination"),
+                                        config.get("defaults", "protocol")))
+        logger.info("Preparando backup de %s" %bfile)
 
-map (lambda x: x.run_backup(), backup_list)
+    map (lambda x: x.run_backup(), backup_list)
