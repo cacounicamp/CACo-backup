@@ -25,6 +25,8 @@
 import os
 import ConfigParser
 import logging
+import optparse
+import sys
 
 ################################################################################
 # Classes
@@ -91,10 +93,23 @@ class BackupTarget(Tools):
             logger.error("Erro na compactação do arquivo, utilizando arquivo original")
 
 ################################################################################
-# Configurando o logging
+# Funções
+################################################################################
+
+# TODO: testar funcionamento do gerador de lista de pacotes
+def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
+    """ Função que gera a lista dos pacotes instalados no sistema """
+    os.system("dpkg -l '*' > " + pkglist_file)
+    return pkglist_file
+
+################################################################################
+# Iniciando a execução do script
 ################################################################################
 
 if __name__ == "__main__":
+    ################################################################################
+    # Configurando o logging
+    ################################################################################
     log_file = os.path.expandvars("${HOME}/caco_backup.log")
     if os.path.lexists(log_file):
         os.remove(log_file) # limpando o log antigo
@@ -103,46 +118,66 @@ if __name__ == "__main__":
     logger = logging.getLogger("backup.py")
     logger.setLevel(logging.DEBUG)
 
-################################################################################
-# Funções
-################################################################################
+    # lendo a configuração
+    # Exemplo de configuração:
+    # [defaults]
+    # destination = /home/ivan/teste
+    # protocol = rsync
+    # files = ~/.vimrc,~/.bashrc,~/.tmux.conf
+    # compression_type = xz
+    # use_compression = false
+    #
+    # [path_to_specific_files]
+    # # aqui vem as opções especiais, irão sobrescrever as padrão
 
-# TODO: testar funcionamento do gerador de lista de pacotes
-    def lista_de_pacotes(pkglist_file = "~/.pkg_list"):
-        """ Função que gera a lista dos pacotes instalados no sistema """
-        os.system("dpkg -l '*' > " + pkglist_file)
-        return pkglist_file
-
-################################################################################
-# Iniciando a execução do script
-################################################################################
-
-# lendo a configuração
-# Exemplo de configuração:
-# [defaults]
-# destination = /home/ivan/teste
-# protocol = rsync
-# files = ~/.vimrc,~/.bashrc,~/.tmux.conf
-# compression_type = xz
-# use_compression = false
-#
-# [path_to_specific_files]
-# # aqui vem as opções especiais, irão sobrescrever as padrão
-
-# TODO: implementar a verificação por compressão
-# TODO: implementar a verificação de seções especiais (i.e., arquivos com opções diferentes)
-# TODO: implementar a validação do arquivo de configuração, somente a seção [defaults] 
-# é obrigatória, com todos os seus membros, e os tipos devem ser verificados
+    # TODO: implementar a verificação por compressão
+    # TODO: implementar a verificação de seções especiais (i.e., arquivos com opções diferentes)
+    # TODO: implementar a validação do arquivo de configuração, somente a seção [defaults]
+    # é obrigatória, com todos os seus membros, e os tipos devem ser verificados
     logger.info("Iniciando o backup")
-# TODO: logar a leitura da configuração
     config_files = ["/etc/caco_backup.conf", os.path.expandvars("${HOME}/.caco_backup.conf")]
     config = ConfigParser.ConfigParser()
     config.read(config_files)
+
+    # avaliando parâmetros de linha de comando
+    options = optparse.OptionParser()
+    # lista de opções, edite aqui se quiser adicionar/remover alguma opção
+    options_list = [
+        # [ opção curta, opção longa, help, valor padrão]
+        ['-p', '--pretend', u'Apenas lista o que vai ser feito', False],
+        ['-d', '--destino', u'Novo destino padrão, afeta apenas os arquivos \
+         listados na seção "defaults" do arquivo de configuração', ''],
+        ['-c', '--comprime', u'Força a compressão dos arquivos padrão com o \
+         algoritmo especificado', ''],
+        ['-t', '--protocol', u'Força o uso do protocolo especificado', '']
+    ]
+    # adicionando as opções
+    for o in options_list:
+        if type(o[3]) is str:
+            options.add_option(o[0], o[1], help=o[2], default=o[3],
+                               action="store")
+        elif type(o[3]) is bool:
+            options.add_option(o[0], o[1], help=o[2], default=o[3],
+                               action="store_true")
+    (opts, args) = options.parse_args(sys.argv)
+    opt = {}
+    # transformando as opções em string e depois em dicionário
+    for o in format(opts).strip('{} ').split(','):
+        lvalue = o.split(':')[0].strip("' '")
+        rvalue = o.split(':')[1].strip("' '")
+        if rvalue is '':
+            opt[lvalue] = rvalue
+        else:
+            opt[lvalue] = eval(rvalue)
 
     backup_list = []
     for bfile in config.get("defaults", "files").split(","):
         backup_list.append(BackupTarget(bfile, config.get("defaults", "destination"),
                                         config.get("defaults", "protocol")))
         logger.info("Preparando backup de %s" %bfile)
-
+    # com pretend apenas imprime origem e destino de cada arquivo do backup
+    if opt['pretend'] is True:
+        for bfile in backup_list:
+            print bfile.source_path + " -> " +bfile.destiny
+        sys.exit(os.EX_OK)
     map (lambda x: x.run_backup(), backup_list)
